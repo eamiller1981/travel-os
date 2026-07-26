@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>Check-In — Travel OS (IA v2)</title>
+  <style>
+    :root {
+      --bg: #f7f5f1;
+      --card: #ffffff;
+      --border: #e0deda;
+      --text: #1f2024;
+      --muted: #6b6e76;
+      --soft: #9a9da6;
+      --accent: #3d5a66;
+      --warm: #c4a574;
+      --hero: #384550;
+      --nav-h: 64px;
+      --radius: 12px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+      background: #e8e6e1;
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+      line-height: 1.4;
+    }
+    .phone {
+      width: 390px;
+      min-height: 100vh;
+      background: var(--bg);
+      position: relative;
+      box-shadow: 0 0 40px rgba(0,0,0,0.12);
+      padding-bottom: calc(var(--nav-h) + 20px);
+    }
+    .status {
+      height: 44px;
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .header {
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px 0 20px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .header .who { display: flex; align-items: center; gap: 8px; }
+    .header .avatar {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: #c8c2b8;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 600; color: #5a5048;
+    }
+    .header .switch {
+      color: var(--accent);
+      font-weight: 600;
+      font-size: 13px;
+      padding: 6px 10px;
+    }
+    .hero {
+      margin: 4px 16px 0;
+      height: 240px;
+      background: var(--hero);
+      border-radius: 16px;
+      position: relative;
+      overflow: hidden;
+      color: #fff;
+    }
+    .hero .art {
+      position: absolute; inset: 0;
+      background: linear-gradient(160deg, #4a5c6a 0%, #2c3842 55%, #1e262c 100%);
+    }
+    .hero .grad {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 50%);
+    }
+    .hero .chip {
+      position: absolute; top: 14px; left: 14px;
+      background: rgba(255,255,255,0.18);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .hero .city {
+      position: absolute; bottom: 78px; left: 16px; right: 16px;
+      font-size: 26px; font-weight: 700; letter-spacing: -0.02em;
+    }
+    .hero .meta {
+      position: absolute; bottom: 52px; left: 16px;
+      font-size: 12px; opacity: 0.9;
+    }
+    .hero .status-row {
+      position: absolute; bottom: 16px; left: 16px; right: 16px;
+      display: flex; align-items: center; gap: 10px;
+      font-size: 12px;
+    }
+    .hero .pill {
+      background: #4d8a6e;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .hero .ambient {
+      margin-left: auto;
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px;
+    }
+    section { padding: 18px 16px 0; }
+    .section-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--soft);
+      margin-bottom: 8px;
+    }
+    .miles-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 14px;
+    }
+    .miles-card .bar {
+      height: 8px;
+      background: #e8e6e1;
+      border-radius: 4px;
+      margin: 8px 0 6px;
+      overflow: hidden;
+    }
+    .miles-card .fill {
+      width: 62%;
+      height: 100%;
+      background: var(--accent);
+      border-radius: 4px;
+    }
+    .miles-card .tease {
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .beacon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      height: 48px;
+      background: #f3e9d8;
+      border-radius: 24px;
+      font-size: 15px;
+      font-weight: 600;
+      color: #4a3a28;
+      margin-top: 12px;
+      cursor: pointer;
+    }
+    .since-row {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+    .since-row::-webkit-scrollbar { display: none; }
+    .since-card {
+      flex: 0 0 118px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+    }
+    .since-card .label { font-size: 10px; color: var(--soft); }
+    .since-card .value { font-size: 13px; font-weight: 600; margin-top: 4px; }
+    .stack-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .stack-card .icon {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      background: #e8e6e1;
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+    }
+    .stack-card .body { flex: 1; min-width: 0; }
+    .stack-card .title { font-size: 13px; font-weight: 600; }
+    .stack-card .sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .stack-card .chev { color: var(--soft); font-size: 18px; }
+    .post-preview {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .post-preview .thumb {
+      height: 120px;
+      background: #c8ccd2;
+    }
+    .post-preview .body {
+      padding: 12px 14px;
+    }
+    .post-preview .eyebrow { font-size: 11px; color: var(--soft); }
+    .post-preview .caption { font-size: 13px; margin-top: 4px; }
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 390px;
+      height: var(--nav-h);
+      background: #fff;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: stretch;
+      z-index: 30;
+    }
+    .bottom-nav a {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      text-decoration: none;
+      color: var(--soft);
+      font-size: 10px;
+      font-weight: 500;
+    }
+    .bottom-nav a.active {
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .bottom-nav .icon-placeholder {
+      width: 22px; height: 22px;
+      border-radius: 6px;
+      background: currentColor;
+      opacity: 0.25;
+    }
+    .bottom-nav a.active .icon-placeholder {
+      opacity: 0.7;
+    }
+    .note {
+      font-size: 11px;
+      color: var(--soft);
+      text-align: center;
+      padding: 20px 16px 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="phone">
+    <div class="status">9:41</div>
+    <div class="header">
+      <div class="who">
+        <div class="avatar">G</div>
+        <span>Grandma</span>
+      </div>
+      <div class="switch">Switch</div>
+    </div>
+    <div class="hero">
+      <div class="art"></div>
+      <div class="grad"></div>
+      <div class="chip">Chapter 4 · Day 118</div>
+      <div class="city">Valencia</div>
+      <div class="meta">Spain · 14:32 local · ☀️ 24°</div>
+      <div class="status-row">
+        <span class="pill">Settled</span>
+        <span style="opacity:0.85">last confirmed 2h ago</span>
+        <div class="ambient">▶</div>
+      </div>
+    </div>
+    <section>
+      <div class="section-label">Miles</div>
+      <div class="miles-card">
+        <div style="font-size:13px;font-weight:600">4,218 mi traveled</div>
+        <div class="bar"><div class="fill"></div></div>
+        <div class="tease">212 mi until the length of the Nile · Witness it</div>
+      </div>
+    </section>
+    <section style="padding-top:12px">
+      <div class="beacon">✨ Send a light</div>
+    </section>
+    <section>
+      <div class="section-label">Since you were here last</div>
+      <div class="since-row">
+        <div class="since-card">
+          <div class="label">Where she moved</div>
+          <div class="value">Valencia</div>
+        </div>
+        <div class="since-card">
+          <div class="label">New for your lens</div>
+          <div class="value">Street cats</div>
+        </div>
+        <div class="since-card">
+          <div class="label">Family moment</div>
+          <div class="value">Bingo caller</div>
+        </div>
+        <div class="since-card">
+          <div class="label">Last 30 days</div>
+          <div class="value">3 cities</div>
+        </div>
+      </div>
+    </section>
+    <section>
+      <div class="section-label">For you</div>
+      <div class="stack-card">
+        <div class="icon">✉</div>
+        <div class="body">
+          <div class="title">2 new stamps in your passport</div>
+          <div class="sub">Valencia · Bingo Caller</div>
+        </div>
+        <div class="chev">›</div>
+      </div>
+      <div class="stack-card">
+        <div class="icon">🎯</div>
+        <div class="body">
+          <div class="title">Game of the week</div>
+          <div class="sub">Horizon Guess · which skyline is next?</div>
+        </div>
+        <div class="chev">›</div>
+      </div>
+    </section>
+    <section>
+      <div class="section-label">Latest post</div>
+      <div class="post-preview">
+        <div class="thumb"></div>
+        <div class="body">
+          <div class="eyebrow">Valencia · 14 Mar</div>
+          <div class="caption">The market smelled like orange blossoms and diesel this morning…</div>
+        </div>
+      </div>
+    </section>
+    <p class="note">Check-In · IA v2</p>
+    <nav class="bottom-nav">
+      <a href="Now.html" class="active">
+        <div class="icon-placeholder"></div>
+        Check-In
+      </a>
+      <a href="City.html">
+        <div class="icon-placeholder"></div>
+        This Stay
+      </a>
+      <a href="Posts.html">
+        <div class="icon-placeholder"></div>
+        Posts
+      </a>
+      <a href="Passport.html">
+        <div class="icon-placeholder"></div>
+        Passport
+      </a>
+      <a href="Explore.html">
+        <div class="icon-placeholder"></div>
+        Journey
+      </a>
+    </nav>
+  </div>
+</body>
+</html>
